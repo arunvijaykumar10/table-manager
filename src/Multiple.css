@@ -1,0 +1,45 @@
+.multipleselectoption {
+    text-align: left;
+    border-color: rgb(219, 11, 11);
+    width: 190px;
+    margin: auto;
+    border-radius: 8px;
+    height: auto;
+  }
+  
+  .header {
+    text-align: center;
+    font: bold;
+    border: auto;
+  }
+  
+  .showOptions {
+    border: 10px;
+    padding: 5px;
+    height: 50%;
+    cursor: pointer;
+  }
+  
+  .selectItem {
+    background-color: rgb(204, 203, 206);
+    border: 1px solid;
+    border-radius: 2px;
+    margin-left: 4px;
+    overflow-y: auto;
+    height: 100px;
+  }
+  
+  .searchbar {
+    width: 90%;
+    padding: 8px;
+    margin: 10px;
+    border: groove;
+    border-radius: 8px;
+    align-items: left;
+    height: 10px;
+  }
+  
+  .multipleOption {
+    margin-bottom: 10px;
+  }
+  

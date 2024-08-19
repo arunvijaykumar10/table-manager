@@ -1,0 +1,35 @@
+
+table {
+  margin-left: 30px;
+  margin-top:40px;
+  width: 10px;
+  }
+  
+  th, td {
+    border: 2px solid #020202;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #7a7676;
+  }
+
+.btn{
+  color:#f7efef;
+  background-color: #020202;
+  margin-left: 50px;
+  margin-top: 40px;
+  padding: 15px 30px;
+
+
+}
+.footer-button{
+  shape-image-threshold:inherit;
+}
+
+
+.btn:hover{
+  background-color: #1a1919;
+}
+
