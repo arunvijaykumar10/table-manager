@@ -16,7 +16,7 @@ type DetailsProps = {
 
 function Details({ rows }: DetailsProps) {
   return (
-    <div >
+    <div className="norowselect" >
       {rows.length === 0 ? (
         <h2>No rows selected.</h2>
       ) : (

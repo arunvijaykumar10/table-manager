@@ -52,13 +52,13 @@ function Nutritions(props: Props) {
 
       {open && (
         <div className="selectItem">
-          <input
+          {/* <input
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="searchbar"
             placeholder="Search"
-          />
+          /> */}
           <label>
             <input
               type="checkbox"

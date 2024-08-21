@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useState } from "react";
 import "./Table.css";
 import Nutritions from "./Multiple";
 import Details from "./Details";
@@ -6,13 +6,17 @@ import _ from "lodash";
 
 type Action =
   | { type: "set-rows"; payload: string[] }
-  | { type: "update-input";payload: { name: string; value: string | boolean | undefined }}
+  | {
+      type: "update-input";
+      payload: { name: string; value: string | boolean | undefined };
+    }
   | { type: "update-shouldCook"; payload: boolean | undefined }
   | { type: "add-row" }
   | { type: "toggle-row"; payload: number }
   | { type: "delete-selected-rows" }
-  | { type: "toggle-details" } 
-  | { type: "delete-row"; payload: number };
+  | { type: "toggle-details" }
+  | { type: "delete-row"; payload: number }
+  | { type: "toggle-all-rows"; payload: boolean };
 
 type State = {
   rows: {
@@ -127,6 +131,15 @@ const reducer = (state: State, action: Action): State => {
         rows: state.rows.filter((_, index) => index !== action.payload),
       };
 
+    case "toggle-all-rows":
+      return {
+        ...state,
+        rows: state.rows.map((row) => ({
+          ...row,
+          isSelected: action.payload,
+        })),
+      };
+
     default:
       return state;
   }
@@ -134,6 +147,8 @@ const reducer = (state: State, action: Action): State => {
 
 function Table() {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [show, setShow] = useState(false);
+  const [isAllSelected, setIsAllSelected] = useState(false);
 
   const handleCheckboxChange = (index: number) => {
     dispatch({ type: "toggle-row", payload: index });
@@ -161,6 +176,12 @@ function Table() {
     });
   };
 
+  const handleAllRowsSelection = () => {
+    const newIsAllSelected = !isAllSelected;
+    setIsAllSelected(newIsAllSelected);
+    dispatch({ type: "toggle-all-rows", payload: newIsAllSelected });
+  };
+
   const addRow = () => {
     dispatch({ type: "add-row" });
   };
@@ -171,6 +192,10 @@ function Table() {
 
   const toggleDetails = () => {
     dispatch({ type: "toggle-details" });
+  };
+
+  const toggleAddForm = () => {
+    setShow(!show);
   };
 
   const logData = () => {
@@ -184,7 +209,9 @@ function Table() {
       <table>
         <thead>
           <tr>
-            <th>Select</th>
+            <th onClick={handleAllRowsSelection} style={{ cursor: "pointer" }}>
+              Select
+            </th>
             <th>Id</th>
             <th>Name</th>
             <th>Description</th>
@@ -203,6 +230,7 @@ function Table() {
                   type="checkbox"
                   checked={row.isSelected}
                   onChange={() => handleCheckboxChange(index)}
+                  className="check"
                 />
               </td>
               <td>{row.id}</td>
@@ -223,66 +251,9 @@ function Table() {
               </td>
             </tr>
           ))}
-          <tr>
-            <td></td>
-            <td></td>
-            <td>
-              <input
-                name="name"
-                value={state.inputValues.name}
-                onChange={handleChange}
-              />
-            </td>
-            <td>
-              <input
-                name="description"
-                value={state.inputValues.description}
-                onChange={handleChange}
-              />
-            </td>
-            <td>
-              <input
-                name="link"
-                value={state.inputValues.link}
-                onChange={handleChange}
-              />
-            </td>
-            <td>
-              <label>
-                Yes
-                <input
-                  type="radio"
-                  name="shouldCook"
-                  checked={state.inputValues.shouldCook === true}
-                  onChange={() => handleShouldCookChange(true)}
-                />
-              </label>
-              <label>
-                No
-                <input
-                  type="radio"
-                  name="shouldCook"
-                  checked={state.inputValues.shouldCook === false}
-                  onChange={() => handleShouldCookChange(false)}
-                />
-              </label>
-            </td>
-            <td>
-              <Nutritions items={items} onSelect={handleNutritionsChange} />
-            </td>
-            <td>
-              <input
-                name="maxIntake"
-                value={state.inputValues.maxIntake}
-                onChange={handleChange}
-              />
-            </td>
-            <td>
-              <button onClick={addRow}>Add</button>
-            </td>
-          </tr>
         </tbody>
       </table>
+
       <div className="footer-button">
         <button className="btn details" onClick={toggleDetails}>
           {state.showDetails ? "Hide Details" : "Details"}
@@ -293,10 +264,77 @@ function Table() {
         <button className="btn delete" onClick={deleteSelectedRows}>
           Delete
         </button>
+        <button className="btn add" onClick={toggleAddForm}>
+          {show ? "Hide Add Form" : "Add"}
+        </button>
       </div>
-      {state.showDetails && (
-        <Details rows={selectedRows} />
-      )}
+      <div className="show">
+        {show && (
+          <div className="addform">
+            <div>
+              <input
+                placeholder="Name"
+                className="input name"
+                name="name"
+                value={state.inputValues.name}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <input
+                placeholder="Description"
+                className="input description"
+                name="description"
+                value={state.inputValues.description}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <input
+                placeholder="Link"
+                className="input link"
+                name="link"
+                value={state.inputValues.link}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>
+                Yes
+                <input
+                  type="checkbox"
+                  name="shouldCook"
+                  checked={state.inputValues.shouldCook === true}
+                  onChange={() => handleShouldCookChange(true)}
+                />
+              </label>
+              <label>
+                No
+                <input
+                  type="checkbox"
+                  name="shouldCook"
+                  checked={state.inputValues.shouldCook === false}
+                  onChange={() => handleShouldCookChange(false)}
+                />
+              </label>
+            </div>
+            <div>
+              <Nutritions items={items} onSelect={handleNutritionsChange} />
+            </div>
+            <div>
+              <input
+                placeholder="Max. Intake per Day"
+                className="input intake"
+                name="maxIntake"
+                value={state.inputValues.maxIntake}
+                onChange={handleChange}
+              />
+            </div>
+            <button onClick={addRow} className="btn add">Add Row</button>
+          </div>
+        )}
+      </div>
+      {state.showDetails && <Details rows={selectedRows} />}
     </div>
   );
 }
