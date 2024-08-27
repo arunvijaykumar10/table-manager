@@ -10,7 +10,7 @@ td {
   border: 2px solid #020202;
   padding: 5px 20px;
   text-align: left;
-    margin-left: 30px;
+  margin-left: 30px;
   margin-top: 40px;
 }
 
@@ -20,14 +20,15 @@ th {
 }
 
 .btn {
-  color:white;
+  color: white;
   background-color: #13405e;
   margin-left: 50px;
   margin-top: 40px;
   padding: 15px 30px;
 }
-.footer-button {
-  shape-image-threshold: inherit;
+.tag-button {
+  margin-top: 200px;
+  margin-left: 10px;
 }
 
 .btn:hover {
@@ -43,13 +44,16 @@ th {
 
 .input {
   margin-top: 10px;
+  border-width: 3px;
+  border-color: #13405e;
 }
 
 .btn add {
   margin-top: 15px;
 }
-.show {
-  margin-top: 20px;
+.Addform {
+  margin-top: 30px;
+  margin-left: 500px;
 }
 .norowselect {
   margin-left: 50px;
@@ -61,3 +65,14 @@ th {
   cursor: pointer;
 }
 
+.selectrow {
+  cursor: pointer;
+}
+.details-row {
+  margin-left: 100px;
+}
+.paragraph{
+  margin-top: auto;
+  margin-left: 20px;
+  color:red;
+}

@@ -1,8 +1,8 @@
 import React, { useReducer, useState } from "react";
 import "./Table.css";
-import Nutritions from "./Multiple";
-import Details from "./Details";
 import _ from "lodash";
+import Form from "./Form";
+import Details from "./Details";
 
 type Action =
   | { type: "set-rows"; payload: string[] }
@@ -11,7 +11,7 @@ type Action =
       payload: { name: string; value: string | boolean | undefined };
     }
   | { type: "update-shouldCook"; payload: boolean | undefined }
-  | { type: "add-row" }
+  | { type: "add-row"; payload: any }
   | { type: "toggle-row"; payload: number }
   | { type: "delete-selected-rows" }
   | { type: "toggle-details" }
@@ -39,14 +39,6 @@ type State = {
   };
   showDetails: boolean;
 };
-
-const items = [
-  { id: 1, label: "Vitamin A", value: "Vitamin A" },
-  { id: 2, label: "Vitamin B", value: "Vitamin B" },
-  { id: 3, label: "Vitamin C", value: "Vitamin C" },
-  { id: 4, label: "Vitamin D", value: "Vitamin D" },
-  { id: 5, label: "Vitamin E", value: "Vitamin E" },
-];
 
 const initialState: State = {
   rows: [],
@@ -91,8 +83,7 @@ const reducer = (state: State, action: Action): State => {
           ...state.rows,
           {
             id: state.rows.length + 1,
-            ...state.inputValues,
-            shouldCook: state.inputValues.shouldCook ?? false,
+            ...action.payload,
             isSelected: false,
           },
         ],
@@ -148,42 +139,20 @@ const reducer = (state: State, action: Action): State => {
 function Table() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [show, setShow] = useState(false);
-  const [isAllSelected, setIsAllSelected] = useState(false);
+  const [isAllSelected, setAllSelected] = useState(false);
 
-  const handleCheckboxChange = (index: number) => {
-    dispatch({ type: "toggle-row", payload: index });
+  const addRow = (newRow: any) => {
+    dispatch({ type: "add-row", payload: newRow });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, type, checked, value } = e.target;
-    dispatch({
-      type: "update-input",
-      payload: { name, value: type === "checkbox" ? checked : value },
-    });
-  };
-
-  const handleShouldCookChange = (shouldCook: boolean | undefined) => {
-    dispatch({
-      type: "update-shouldCook",
-      payload: shouldCook,
-    });
-  };
-
-  const handleNutritionsChange = (nutritions: string) => {
-    dispatch({
-      type: "update-input",
-      payload: { name: "nutritions", value: nutritions },
-    });
+  const toggleAddForm = () => {
+    setShow(!show);
   };
 
   const handleAllRowsSelection = () => {
     const newIsAllSelected = !isAllSelected;
-    setIsAllSelected(newIsAllSelected);
+    setAllSelected(newIsAllSelected);
     dispatch({ type: "toggle-all-rows", payload: newIsAllSelected });
-  };
-
-  const addRow = () => {
-    dispatch({ type: "add-row" });
   };
 
   const deleteSelectedRows = () => {
@@ -193,11 +162,6 @@ function Table() {
   const toggleDetails = () => {
     dispatch({ type: "toggle-details" });
   };
-
-  const toggleAddForm = () => {
-    setShow(!show);
-  };
-
   const logData = () => {
     console.log("Current State:", state);
   };
@@ -209,7 +173,7 @@ function Table() {
       <table>
         <thead>
           <tr>
-            <th onClick={handleAllRowsSelection} style={{ cursor: "pointer" }}>
+            <th onClick={handleAllRowsSelection} className="select rows">
               Select
             </th>
             <th>Id</th>
@@ -229,8 +193,9 @@ function Table() {
                 <input
                   type="checkbox"
                   checked={row.isSelected}
-                  onChange={() => handleCheckboxChange(index)}
-                  className="check"
+                  onChange={() =>
+                    dispatch({ type: "toggle-row", payload: index })
+                  }
                 />
               </td>
               <td>{row.id}</td>
@@ -254,87 +219,22 @@ function Table() {
         </tbody>
       </table>
 
-      <div className="footer-button">
-        <button className="btn details" onClick={toggleDetails}>
-          {state.showDetails ? "Hide Details" : "Details"}
+      <div className="tag-button">
+        <button onClick={toggleDetails} className="btn details">
+          {state.showDetails ? "Details" : "Details"}
+        </button>
+        <button onClick={deleteSelectedRows} className="btn delete">
+          Delete
         </button>
         <button className="btn log" onClick={logData}>
           Log
         </button>
-        <button className="btn delete" onClick={deleteSelectedRows}>
-          Delete
+        <button onClick={toggleAddForm} className="btn add">
+          Add
         </button>
-        <button className="btn add" onClick={toggleAddForm}>
-          {show ? "Hide Add Form" : "Add"}
-        </button>
-      </div>
-      <div className="show">
-        {show && (
-          <div className="addform">
-            <div>
-              <input
-                placeholder="Name"
-                className="input name"
-                name="name"
-                value={state.inputValues.name}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <input
-                placeholder="Description"
-                className="input description"
-                name="description"
-                value={state.inputValues.description}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <input
-                placeholder="Link"
-                className="input link"
-                name="link"
-                value={state.inputValues.link}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label>
-                Yes
-                <input
-                  type="checkbox"
-                  name="shouldCook"
-                  checked={state.inputValues.shouldCook === true}
-                  onChange={() => handleShouldCookChange(true)}
-                />
-              </label>
-              <label>
-                No
-                <input
-                  type="checkbox"
-                  name="shouldCook"
-                  checked={state.inputValues.shouldCook === false}
-                  onChange={() => handleShouldCookChange(false)}
-                />
-              </label>
-            </div>
-            <div>
-              <Nutritions items={items} onSelect={handleNutritionsChange} />
-            </div>
-            <div>
-              <input
-                placeholder="Max. Intake per Day"
-                className="input intake"
-                name="maxIntake"
-                value={state.inputValues.maxIntake}
-                onChange={handleChange}
-              />
-            </div>
-            <button onClick={addRow} className="btn add">Add Row</button>
-          </div>
-        )}
       </div>
       {state.showDetails && <Details rows={selectedRows} />}
+      {show && <Form addRow={addRow} />}
     </div>
   );
 }

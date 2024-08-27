@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import "./Multiple.css";
 import _ from "lodash";
+import "./Multiple.css";
+import "./Table.css";
 
 interface Props {
   items: {
@@ -9,21 +10,20 @@ interface Props {
     value: string;
   }[];
   onSelect: (nutritions: string) => void;
+  errorMessage?: string;
 }
 
-function Nutritions(props: Props) {
-  const { items, onSelect } = props;
-
-  const [selectedItem, setSelectedItem] = useState<string[]>([]);
+function Nutritions({ items, onSelect, errorMessage }: Props) {
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
 
   const handleClick = (item: string) => {
-    setSelectedItem((prev) => {
+    setSelectedItems((prev) => {
       const newSelected = prev.includes(item)
         ? prev.filter((i) => i !== item)
         : [...prev, item];
-      
+
       onSelect(newSelected.join(", "));
       return newSelected;
     });
@@ -33,13 +33,13 @@ function Nutritions(props: Props) {
     _.includes(_.toLower(item.value), _.toLower(search))
   );
 
-  const SelectAll = () => {
-    if (selectedItem.length > 0) {
-      setSelectedItem([]);
+  const handleSelectAll = () => {
+    if (selectedItems.length === items.length) {
+      setSelectedItems([]);
       onSelect("");
     } else {
-      const allValues = items.map(item => item.value);
-      setSelectedItem(allValues);
+      const allValues = items.map((item) => item.value);
+      setSelectedItems(allValues);
       onSelect(allValues.join(", "));
     }
   };
@@ -47,31 +47,38 @@ function Nutritions(props: Props) {
   return (
     <div className="multipleselectoption">
       <div className="showOptions" onClick={() => setOpen(!open)}>
-        <input type="text" value={selectedItem.join(", ")} className="selecting-options" readOnly />
+        <input
+          placeholder="Nutritions"
+          type="text"
+          value={selectedItems.join(", ")}
+          readOnly
+          className="nutritions"
+          required
+        />
       </div>
 
       {open && (
         <div className="selectItem">
-          {/* <input
-            type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="searchbar"
-            placeholder="Search"
-          /> */}
           <label>
             <input
               type="checkbox"
-              checked={selectedItem.length === items.length}
-              onChange={SelectAll}
+              checked={selectedItems.length === items.length}
+              onChange={handleSelectAll}
             />
             Select All
           </label>
+          <input
+            type="text"
+            placeholder="Search..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="searchInput"
+          />
           {filteredItems.map((item) => (
             <label key={item.id} className="multipleOption">
               <input
                 type="checkbox"
-                checked={selectedItem.includes(item.value)}
+                checked={selectedItems.includes(item.value)}
                 onChange={() => handleClick(item.value)}
               />
               {item.label}
@@ -79,6 +86,7 @@ function Nutritions(props: Props) {
           ))}
         </div>
       )}
+      {errorMessage && <p className="paragraph error">{errorMessage}</p>}
     </div>
   );
 }
